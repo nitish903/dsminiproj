@@ -1,0 +1,139 @@
+#include<stdio.h>
+#include<malloc.h>
+#include<conio.h>
+#include<time.h>
+struct Process 
+{ 
+    int pid;  // Process ID 
+    int bt;   // CPU Burst time required 
+    int priority; // Priority of this process
+    struct Process *next; //pointer to next 
+};
+ struct Process *start;
+ 
+
+void delay(int number_of_seconds) 
+{ 
+    // Converting time into milli_seconds 
+    int milli_seconds = 1000 * number_of_seconds; 
+  
+    // Stroing start time 
+    clock_t start_time = clock(); 
+  
+    // looping till required time is not acheived 
+    while (clock() < start_time + milli_seconds) ;
+ 
+}
+
+void itinerary(struct Process *start)
+{
+	struct Process *ptr;
+	ptr = start;
+	if(start == NULL)
+ 	printf("\nSchedule is empty" );
+	else
+	{
+ 	  printf("\n Current schedule is  :  " );
+	  while(ptr != NULL)
+ 	  {
+ 		printf( "\t%d[priority=%d]", ptr->pid, ptr->priority );
+ 		ptr=ptr->next;
+ 	  }
+	}
+}
+
+
+
+struct Process *qdelete(struct Process *start)
+{
+	struct Process *ptr;
+	if(start == NULL)
+	{
+ 	  printf("\n No schedule" );
+ 	  return start ;
+	}
+	else	
+	{
+ 	  ptr = start;
+ 	  printf("\n Deleted Process is: %d",ptr->pid);
+ 	  start = start->next;
+ 	  free(ptr);
+	}
+	return start;
+}
+
+void run(struct Process *start)
+{
+    struct Process *ptr=start;
+    do{
+	printf("The current schedule is : \n");
+	itinerary(start);
+	printf("Executing the highest priority process... \n");
+	delay(ptr->bt);
+	printf("The process took ....%d seconds \n",ptr->bt);
+	printf("process executed \n ");
+	start=qdelete(start);
+      }while(ptr->next!=NULL);
+}
+
+
+struct Process *insert(struct Process *start)
+{
+	int val, pri,burst_time;
+	struct Process *ptr, *p;
+	ptr = (struct Process*)malloc(sizeof(struct Process));
+	printf("\n Enter the processid and its priority and  runtime :\n ");
+	printf("\n process id=");scanf("%d",&val);
+	printf("\n priority=");scanf("%d",&pri);
+	printf("\n runtime=");scanf("%d",&burst_time);
+	ptr->pid = val;	ptr->bt=burst_time;
+	ptr->priority = pri;
+	if(start==NULL || pri < start->priority )
+	{
+ 	   ptr->next = start;
+ 	   start = ptr;
+	}		
+	else
+	{
+ 	   p = start;
+	   while(p->next != NULL && p->next->priority <= pri)
+ 	   p = p->next;
+ 	   ptr->next = p->next;
+ 	   p->next = ptr;
+	}
+	return start;
+}
+
+
+int main()
+{
+    int option;
+    
+    do
+    {//clrscr();
+	  printf("\n\t\t\t\t\t\t\t *****MAIN MENU*****");
+  	  printf("\n\t\t\t\t\t\t\t 1.INSERT ");
+  	  printf("\n\t\t\t\t\t\t\t 2.DELETE");
+  	  printf("\n\t\t\t\t\t\t\t 3.ITINERARY");
+  	  printf("\n\t\t\t\t\t\t\t 4.RUN");
+  	  printf("\n\t\t\t\t\t\t\t 5.END");
+  	  printf("\n Enter your option :\n ");
+  	  scanf( "%d", &option);
+  	  //clrscr();
+	  switch(option)
+ 	  {
+   	   	case 1: start=insert(start);
+	   		break;
+   		case 2: start =qdelete(start);
+	   		break;
+   		case 3: itinerary(start);
+	   		break;
+   		case 4: run(start);
+ 	   		break;
+   		case 5: break;
+ 		default:printf("\nInvalid Input");
+ 	  }
+    }while(option!=5);
+    getch();
+    return 0;
+}
